@@ -21,8 +21,8 @@ const bookRoutes = require("./routes/bookRoutes");
 
 
 app.get("/", (request, response, next) => {
-  response.send("This route points to the Home page");
-  respond.status(200).json({ 
+//   response.send("This route points to the Home page");
+  response.status(200).json({ 
     success: { message: "This route points to the Home page" },
     statusCode: 200
 });
