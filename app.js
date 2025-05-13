@@ -10,35 +10,26 @@ app.use(cors());
 app.use(morgan("combined"));
 app.use(helmet());
 
+
 const path = require("node:path");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 app.use(express.urlencoded());
 
+const bookRoutes = require("./routes/bookRoutes");
+
+
 app.get("/", (request, response, next) => {
   response.send("This route points to the Home page");
+  respond.status(200).json({ 
+    success: { message: "This route points to the Home page" },
+    statusCode: 200
+});
 });
 
-app.get("/api/books", (request, response, next) => {
-  response.send("This will send all of the book data");
-});
+app.use("/api/books", bookRoutes);
 
-app.get("/api/books/:id", (request, response, next) => {
-  response.send("This will send a single book by its id");
-});
-
-app.get("/api/books/create/new", (request, response, next) => {
-  response.send("This will create a new book");
-});
-
-app.get("/api/books/update/:id", (request, response, next) => {
-  response.send("This will update a book by its id");
-});
-
-app.get("/api/books/delete/:id", (request, response, next) => {
-  response.send("This will delete a book by its id");
-});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on http://localhost:${PORT}.`);
