@@ -8,8 +8,8 @@ router.post("/register", register);
 
 router.get("/login", login);
 
-router.get("/login/error", (resquest, response, next) => {
-    response.json("Login error"),
+router.get("/login/error", (request, response, next) => {
+    return response.json("Login error")
 });
 
 router.get("/login/local", localLogin);

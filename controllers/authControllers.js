@@ -14,7 +14,7 @@ const register = async (request, response, next) => {
       data: { newUser },
       statuscode: 201,
     });
-  } catch {
+  } catch(error) {
     response.status(500).json({
       error: { message: "Internal server error!" },
     });

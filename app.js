@@ -29,7 +29,7 @@ app.get("/", (request, response, next) => {
 });
 
 app.use("/api/books", bookRoutes);
-app.use('/auth', authRoutes);
+app.use("/auth", authRoutes);
 
 
 app.listen(PORT, () => {

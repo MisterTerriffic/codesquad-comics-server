@@ -1,15 +1,15 @@
-const { response, request } = require("express");
-const books = require("../data/books");
+const booksData = require("../data/books");
 
 const getAllBooks = async (request, response, next) => {
-  const books = booksData;
 
   try {
+    const books = booksData;
+    
     return response.status(200).json({
       success: { message: "This routes returns all books in the inventory" },
       data: { books },
     });
-  } catch {
+  } catch(error) {
     return response.status(400).json({
       error: { message: "Inventory not found. Try again." },
     });
@@ -68,8 +68,8 @@ const createBook = async (request, response, next) => {
 
 const updateBook = async (request, response, next) => {
   const { _id } = request.params;
-  
-    const {
+
+  const {
     title,
     author,
     publisher,
