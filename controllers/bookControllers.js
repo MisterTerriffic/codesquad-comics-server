@@ -1,34 +1,41 @@
-const booksData = require("../data/books");
+// const booksData = require("../data/books");
+const Book = require("../models/bookModel");
 
 const getAllBooks = async (request, response, next) => {
 
   try {
-    const books = booksData;
+    const books = Books;
     
     return response.status(200).json({
       success: { message: "This routes returns all books in the inventory" },
       data: { books },
     });
   } catch(error) {
-    return response.status(400).json({
-      error: { message: "Inventory not found. Try again." },
-    });
-  }
+    return next(error);
+    };
 };
 
 const getBook = async (request, response, next) => {
   const { _id } = request.params;
 
   try {
-    const book = booksData.find((book) => book._id === _id);
+    // const book = booksData.find((book) => book._id === _id);
+      if(!_id){
+    throw new Error("Id is required");
+  };
+
+    const book = Book.findById(_id);
+
+    if(!book){
+      throw new Error( "Book not found");
+    };
+
     return response.status(200).json({
       success: { message: "Eureka!" },
       data: { book }, //Not in instructions, thought it was needed
     });
-  } catch {
-    return response.status(400).json({
-      error: { message: "Unable to retrieve book. Try again." },
-    });
+  } catch(error) {
+    return next(error);
   }
 };
 
@@ -45,6 +52,12 @@ const createBook = async (request, response, next) => {
   } = request.body;
 
   try {
+
+    if(!title || !author || !pages) {
+      throw new error("Insufficient Data. Enter Again")
+    };
+
+
     const newBook = {
       title,
       author,
@@ -55,21 +68,22 @@ const createBook = async (request, response, next) => {
       synopsis,
       imageURL,
     };
+
+    await newBook.save()
+
     return response.status(201).json({
       success: { message: "Created a new book." },
       data: { newBook },
     });
   } catch {
-    return response.status(400).json({
-      error: { message: "Unable to create a book. Try again." },
-    });
+    return next(error);
   }
 };
 
 const updateBook = async (request, response, next) => {
   const { _id } = request.params;
 
-  const {
+  const updateBook {
     title,
     author,
     publisher,
@@ -81,15 +95,30 @@ const updateBook = async (request, response, next) => {
   } = request.body;
 
   try {
-    const updateBook = {
-      title,
-      author,
-      publisher,
-      genre,
-      pages,
-      ratings,
-      synopsis,
-      imageURL,
+
+     if(!title || !author || !pages) {
+      throw new error("Insufficient Data. Enter Again")
+    };
+
+   const updatedBook = await Book.findByIdAndUpdate(
+      _id,
+      {
+        $set: {
+          title,
+          author,
+          publisher,
+          genre,
+          pages,
+          ratings,
+          synopsis,
+          imageURL,
+        }
+      },
+      {new: true}
+    );
+
+     if (!updatedBook) {
+      throw new Error("Book not found");
     };
 
     return response.status(201).json({
@@ -97,10 +126,8 @@ const updateBook = async (request, response, next) => {
       data: { updateBook },
     });
   } catch {
-    return response.status(400).json({
-      error: { message: "Book updated failed. Try again." },
-    });
-  }
+    return next(error);
+  };
 };
 
 const deleteBook = async (request, response, next) => {
