@@ -75,7 +75,7 @@ const createBook = async (request, response, next) => {
       success: { message: "Created a new book." },
       data: { newBook },
     });
-  } catch {
+  } catch(error) {
     return next(error);
   }
 };
@@ -125,7 +125,7 @@ const updateBook = async (request, response, next) => {
       success: { message: "Book updated." },
       data: { updateBook },
     });
-  } catch {
+  } catch(error) {
     return next(error);
   };
 };
@@ -134,15 +134,21 @@ const deleteBook = async (request, response, next) => {
   const { _id } = request.params;
 
   try {
-    const books = booksData.filter((book) => book._id !== _id);
-    return response.status(201).json({
+
+      if(!_id){
+    throw new Error("Id is required");
+  };
+
+    // const books = booksData.filter((book) => book._id !== _id);
+     await Book.findByIdAndDelete(_id);
+
+    return response.status(200).json({
       success: { message: "Book deleted." },
       data: { books },
     });
-  } catch {
-    return response.status(400).json({
-      error: { message: "Unable to delete the book. Try again." },
-    });
+  } catch(error) {
+    return next(error);
+  };
   }
 };
 
