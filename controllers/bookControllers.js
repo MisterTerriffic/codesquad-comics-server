@@ -4,7 +4,7 @@ const Book = require("../models/bookModel");
 const getAllBooks = async (request, response, next) => {
 
   try {
-    const books = Books;
+    const books = Book;
     
     return response.status(200).json({
       success: { message: "This routes returns all books in the inventory" },
@@ -83,7 +83,7 @@ const createBook = async (request, response, next) => {
 const updateBook = async (request, response, next) => {
   const { _id } = request.params;
 
-  const updateBook {
+  const {
     title,
     author,
     publisher,
@@ -97,7 +97,7 @@ const updateBook = async (request, response, next) => {
   try {
 
      if(!title || !author || !pages) {
-      throw new error("Insufficient Data. Enter Again")
+      throw new error("Insufficient Data. Enter Again");
     };
 
    const updatedBook = await Book.findByIdAndUpdate(
@@ -149,7 +149,6 @@ const deleteBook = async (request, response, next) => {
   } catch(error) {
     return next(error);
   };
-  }
-};
+  };
 
 module.exports = { getAllBooks, getBook, createBook, updateBook, deleteBook };
