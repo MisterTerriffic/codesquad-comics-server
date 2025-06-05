@@ -1,5 +1,5 @@
 const register = async (request, response, next) => {
-  const { firstName, lastName, userName, password } = request.body;
+  const { firstName, lastName, username, password } = request.body;
 
   try {
     const newUser = {
@@ -65,4 +65,4 @@ const localLogin = async (request, response, next) => {
   });
 };
 
-module.exports();
+module.exports = { register, login, localLogin, logout };

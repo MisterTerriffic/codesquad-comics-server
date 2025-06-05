@@ -9,7 +9,7 @@ async function main() {
 
     } catch (error){
         console.error(`There was an error connecting to the database: ${error}`);
-        next(error);
+        // next(error);
     }
 }
 

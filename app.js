@@ -19,6 +19,7 @@ app.use(express.static(path.join(__dirname)));
 app.use(express.urlencoded());
 
 const bookRoutes = require("./routes/bookRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 
 app.get("/", (request, response, next) => {
