@@ -1,25 +1,45 @@
 require("dotenv").config();
+require("./config/connection"); 
+require("./config/authStrategy");
 const express = require("express");
 const app = express();
-const PORT = 8080;
+const PORT = process.env.port;
 
 const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }
+));
 app.use(morgan("combined"));
-app.use(helmet());
+app.use(helmet({contentSecurityPolicy: false}));
 
 
 const path = require("node:path");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(session({
+   resave: false,
+    saveUninitialized: false, 
+    secret: process.env.SECRET_KEY,
+
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      maxAge: 1000 * 60 * 60 * 24,
+    }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 const bookRoutes = require("./routes/bookRoutes");
 const authRoutes = require("./routes/authRoutes");
+const { session } = require("passport");
 
 
 app.get("/", (request, response, next) => {
@@ -32,6 +52,20 @@ app.get("/", (request, response, next) => {
 
 app.use("/api/books", bookRoutes);
 app.use("/auth", authRoutes);
+
+app.use((err, req, res, next) => {
+if (11000) { 
+return res.status(400).json({ 
+error: { message: "Already have an account? Try logging in." },
+statusCode: 400,
+});
+}
+return res.status(500).json({ 
+error: { message: err.message || "Internal server error. Oh no!" },
+statusCode: 500, 
+});
+});
+
 
 
 app.listen(PORT, () => {
