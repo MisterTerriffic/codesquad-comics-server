@@ -1,23 +1,47 @@
+const passport = require("passport");
+const bcrypt = require("bcrypt");
+
 const register = async (request, response, next) => {
-  const { firstName, lastName, username, password } = request.body;
+  const { firstName, lastName, username, password, googleId } = request.body;
+
+  if(error){
+    return next(error)
+  } else if(!firstName || !username || !password ){
+    return response.status(400).json({
+      error: {message: "Missing required field."},
+      statuscode: 400,
+    })
+  };
 
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = {
-      firstName,
-      lastName,
-      username,
-      password,
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      password: hashedPassword,
+      googleId: googleId,
     };
-    console.log("code is operational");
-    response.status(201).json({
+
+    await newUser.save();
+
+    request.login(() =>{
+      if(error){
+        return next(error);
+      }
+
+      newUser.password = undefined;
+
+
+      response.status(201).json({
       success: { message: "New user is created" },
-      data: { newUser },
+      data: { user: newUser },
       statuscode: 201,
     });
+    })
   } catch(error) {
-    response.status(500).json({
-      error: { message: "Internal server error!" },
-    });
+    return next(error)
   }
 };
 
@@ -28,40 +52,69 @@ const login = async (request, response, next) => {
 };
 
 const logout = (request, response, next) => {
-  console.log("Initializing logout controller logic...");
 
-  response.clearCookie("connect.sid");
-
-  response.status(200).json({
-    success: { message: "User logging out." },
-  });
-
-  function sessionDestruction(err) {
-    if (err) {
-      return next(err);
+  request.logout((error) => {
+    if(error){
+      return next(error);
     }
-  }
-  sessionDestruction();
 
-  console.log("Logout function activated. Logging out...");
+    request.session.destroy(error => {
+      if(error){
+        return next(error);
+      }
+
+      response.clearCookie("connection.sid")
+      return response.status(200).json({
+        success: { message: "Logged out successful" },
+        statuscode: 200,
+      })
+    })
+  });
+  // console.log("Initializing logout controller logic...");
+
+  // response.clearCookie("connect.sid");
+
+  // response.status(200).json({
+  //   success: { message: "User logging out." },
+  // });
+
+  // function sessionDestruction(err) {
+  //   if (err) {
+  //     return next(err);
+  //   }
+  // }
+  // sessionDestruction();
+
+  // console.log("Logout function activated. Logging out...");
 };
 
 const localLogin = async (request, response, next) => {
-  let result = true;
+   passport.authenticate("local", (error, user, info) => {
+    if(error){
+      return next(error);
+    };
 
-  function mockPassport(err, user) {
-    //error handling as a final check and a failsafe
-    if (err) {
-      return next(err);
+    if(!user){
+      return response.status(401).json({
+        error: { message: info.message},
+      });
     }
-  }
-  //call the mockPassport feature
-  mockPassport();
 
-  response.status(200).json({
-    success: { message: "Login Successful" },
-    data: { user, userCopy },
+    request.login(user, (error) => {
+      if(error){
+        return next(error)
+      }
+
+  const userCopy = { ...request.user._doc };
+  userCopy.password = undefined;
+    })
+
+    response.status(200).json({
+      success: { message: "Login Successful with local authentication."},
+       data: { user, userCopy },
+       statuscode: 201,
     result,
+    })
   });
 };
 

@@ -12,7 +12,7 @@ const userSchema = new Schema({
         type: String,
         trim: true,
     },
-    email: {
+    username: {
         type: String,
         required: true,
         trim: true,
@@ -27,9 +27,6 @@ const userSchema = new Schema({
     googleId: {
         type: String,
     },
-    githubId: {
-        type: String,
-    }
 });
 
 const User = mongoose.model("User", userSchema);

@@ -4,7 +4,7 @@ const Book = require("../models/bookModel");
 const getAllBooks = async (request, response, next) => {
 
   try {
-    const books = Book;
+    const books = await Book.find({});
     
     return response.status(200).json({
       success: { message: "This routes returns all books in the inventory" },
@@ -20,11 +20,11 @@ const getBook = async (request, response, next) => {
 
   try {
     // const book = booksData.find((book) => book._id === _id);
+    const book = await Book.findById(_id);
       if(!_id){
     throw new Error("Id is required");
   };
 
-    const book = Book.findById(_id);
 
     if(!book){
       throw new Error( "Book not found");
