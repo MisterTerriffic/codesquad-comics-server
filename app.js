@@ -3,11 +3,15 @@ require("./config/connection");
 require("./config/authStrategy");
 const express = require("express");
 const app = express();
-const PORT = process.env.port;
+const PORT = process.env.PORT;
 
 const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
+
+const passport = require("passport");
+const session = require("express-session");
+
 
 app.use(cors({ credentials: true, origin: true }
 ));
@@ -30,7 +34,7 @@ app.use(session({
       httpOnly: true,
       secure: false,
       maxAge: 1000 * 60 * 60 * 24,
-    }
+    },
 }));
 
 app.use(passport.initialize());
@@ -39,7 +43,6 @@ app.use(passport.session());
 
 const bookRoutes = require("./routes/bookRoutes");
 const authRoutes = require("./routes/authRoutes");
-const { session } = require("passport");
 
 
 app.get("/", (request, response, next) => {
