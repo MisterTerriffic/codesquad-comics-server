@@ -3,7 +3,7 @@ require("./config/connection");
 require("./config/authStrategy");
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 
 const morgan = require("morgan");
 const cors = require("cors");
@@ -11,6 +11,7 @@ const helmet = require("helmet");
 
 const passport = require("passport");
 const session = require("express-session");
+const path = require("node:path");
 
 
 app.use(cors({ credentials: true, origin: true }
@@ -18,8 +19,6 @@ app.use(cors({ credentials: true, origin: true }
 app.use(morgan("combined"));
 app.use(helmet({contentSecurityPolicy: false}));
 
-
-const path = require("node:path");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
@@ -56,16 +55,17 @@ app.get("/", (request, response, next) => {
 app.use("/api/books", bookRoutes);
 app.use("/auth", authRoutes);
 
-app.use((err, req, res, next) => {
+app.use((error, request, response, next) => {
 if (11000) { 
-return res.status(400).json({ 
+return response.status(400).json({ 
 error: { message: "Already have an account? Try logging in." },
 statusCode: 400,
 });
 }
-return res.status(500).json({ 
-error: { message: err.message || "Internal server error. Oh no!" },
-statusCode: 500, 
+
+return response.status(500).json({ 
+error: { message: error.message || "Internal server error. Oh no!" },
+statusCode: error.status || 500, 
 });
 });
 

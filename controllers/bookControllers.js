@@ -54,7 +54,7 @@ const createBook = async (request, response, next) => {
   try {
 
     if(!title || !author || !pages) {
-      throw new error("Insufficient Data. Enter Again")
+      throw new Error("Insufficient Data. Enter Again")
     };
 
 
@@ -97,7 +97,7 @@ const updateBook = async (request, response, next) => {
   try {
 
      if(!title || !author || !pages) {
-      throw new error("Insufficient Data. Enter Again");
+      throw new Error("Insufficient Data. Enter Again");
     };
 
    const updatedBook = await Book.findByIdAndUpdate(
